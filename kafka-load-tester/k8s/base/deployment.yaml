@@ -1,0 +1,83 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: kafka-load-tester
+  labels:
+    app: kafka-load-tester
+    component: load-generator
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: kafka-load-tester
+  template:
+    metadata:
+      labels:
+        app: kafka-load-tester
+        component: load-generator
+      annotations:
+        prometheus.io/scrape: "true"
+        prometheus.io/port: "8000"
+        prometheus.io/path: "/metrics"
+    spec:
+      securityContext:
+        runAsNonRoot: true
+        runAsUser: 1000
+        fsGroup: 1000
+      containers:
+      - name: load-tester
+        image: kafka-load-tester:latest
+        imagePullPolicy: IfNotPresent
+        ports:
+        - name: http
+          containerPort: 8000
+          protocol: TCP
+        env:
+        - name: KAFKA_BOOTSTRAP_SERVERS
+          valueFrom:
+            configMapKeyRef:
+              name: kafka-load-tester-config
+              key: kafka_bootstrap_servers
+        - name: KAFKA_TOPIC
+          valueFrom:
+            configMapKeyRef:
+              name: kafka-load-tester-config
+              key: kafka_topic
+        - name: KAFKA_COMPRESSION_TYPE
+          valueFrom:
+            configMapKeyRef:
+              name: kafka-load-tester-config
+              key: kafka_compression_type
+        - name: KAFKA_ACKS
+          valueFrom:
+            configMapKeyRef:
+              name: kafka-load-tester-config
+              key: kafka_acks
+        - name: PRODUCER_POOL_SIZE
+          valueFrom:
+            configMapKeyRef:
+              name: kafka-load-tester-config
+              key: producer_pool_size
+        resources:
+          requests:
+            cpu: 100m
+            memory: 128Mi
+          limits:
+            cpu: 500m
+            memory: 512Mi
+        livenessProbe:
+          httpGet:
+            path: /health
+            port: http
+          initialDelaySeconds: 30
+          periodSeconds: 10
+          timeoutSeconds: 5
+          failureThreshold: 3
+        readinessProbe:
+          httpGet:
+            path: /health
+            port: http
+          initialDelaySeconds: 10
+          periodSeconds: 5
+          timeoutSeconds: 3
+          failureThreshold: 3

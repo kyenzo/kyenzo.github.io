@@ -1,0 +1,124 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Kafka Load Tester</title>
+    <link rel="stylesheet" href="/static/style.css">
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>⚡ Kafka Load Tester</h1>
+            <div id="connection-status" class="status-badge disconnected">Disconnected</div>
+        </header>
+
+        <div class="grid">
+            <!-- Configuration Panel -->
+            <div class="card">
+                <h2>Load Test Configuration</h2>
+                <form id="load-test-form">
+                    <div class="form-group">
+                        <label for="message-count">Number of Messages:</label>
+                        <input type="number" id="message-count" value="1000" min="1" max="10000000" required>
+                        <small>Range: 1 - 10,000,000</small>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="message-rate">Messages per Second:</label>
+                        <input type="number" id="message-rate" value="100" min="1" max="100000" required>
+                        <small>Range: 1 - 100,000</small>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="topic">Kafka Topic:</label>
+                        <input type="text" id="topic" value="load-test" required>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="payload-size">Payload Size (bytes):</label>
+                        <input type="number" id="payload-size" value="100" min="1" max="1048576" required>
+                        <small>Range: 1 - 1,048,576 (1MB)</small>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="test-name">Test Name (optional):</label>
+                        <input type="text" id="test-name" placeholder="e.g., baseline-test">
+                    </div>
+
+                    <div class="button-group">
+                        <button type="submit" id="start-btn" class="btn btn-primary">Start Load Test</button>
+                        <button type="button" id="stop-btn" class="btn btn-danger" disabled>Stop Test</button>
+                    </div>
+                </form>
+            </div>
+
+            <!-- Status Panel -->
+            <div class="card">
+                <h2>Current Status</h2>
+                <div id="status-display">
+                    <div class="status-item">
+                        <span class="label">Test Running:</span>
+                        <span id="status-running" class="value">No</span>
+                    </div>
+                    <div class="status-item">
+                        <span class="label">Test ID:</span>
+                        <span id="status-test-id" class="value">-</span>
+                    </div>
+                    <div class="status-item">
+                        <span class="label">Messages Sent:</span>
+                        <span id="status-sent" class="value">0</span>
+                    </div>
+                    <div class="status-item">
+                        <span class="label">Messages Failed:</span>
+                        <span id="status-failed" class="value">0</span>
+                    </div>
+                    <div class="status-item">
+                        <span class="label">Current Rate:</span>
+                        <span id="status-rate" class="value">0 msg/s</span>
+                    </div>
+                    <div class="status-item">
+                        <span class="label">Elapsed Time:</span>
+                        <span id="status-elapsed" class="value">0s</span>
+                    </div>
+                    <div class="status-item">
+                        <span class="label">Progress:</span>
+                        <span id="status-progress" class="value">0%</span>
+                    </div>
+                </div>
+
+                <div class="progress-bar">
+                    <div id="progress-fill" class="progress-fill"></div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Quick Presets -->
+        <div class="card">
+            <h2>Quick Test Presets</h2>
+            <div class="preset-buttons">
+                <button class="btn btn-secondary preset-btn" data-count="1000" data-rate="100">
+                    Small: 1K @ 100/s
+                </button>
+                <button class="btn btn-secondary preset-btn" data-count="10000" data-rate="1000">
+                    Medium: 10K @ 1K/s
+                </button>
+                <button class="btn btn-secondary preset-btn" data-count="100000" data-rate="5000">
+                    Large: 100K @ 5K/s
+                </button>
+                <button class="btn btn-secondary preset-btn" data-count="1000000" data-rate="10000">
+                    Stress: 1M @ 10K/s
+                </button>
+            </div>
+        </div>
+
+        <!-- Logs -->
+        <div class="card">
+            <h2>Activity Log</h2>
+            <div id="log-display" class="log-display"></div>
+        </div>
+    </div>
+
+    <script src="/static/app.js"></script>
+</body>
+</html>
